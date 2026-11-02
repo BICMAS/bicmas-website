@@ -1,5 +1,8 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, X } from "lucide-react";
 import { SiteContainer } from "@/components/shared/site-container";
 
 type NavLink = {
@@ -83,6 +86,9 @@ function NavDropdown({ item }: { item: NavItem }) {
 }
 
 export function SiteHeader() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const closeMobile = () => setMobileOpen(false);
+
   return (
     <header className="sticky top-0 z-50 border-b border-cyan-500/10 bg-navy-950/95 backdrop-blur-xl">
       <SiteContainer>
@@ -113,17 +119,33 @@ export function SiteHeader() {
             )}
           </nav>
 
-          <Link href="/contact" className="btn-primary shrink-0 px-4 py-2 text-xs sm:px-5 sm:py-2.5 sm:text-sm">
-            <span className="hidden sm:inline">Book a Demo</span>
-            <span className="sm:hidden">Demo</span>
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href="/contact" className="btn-primary shrink-0 px-4 py-2 text-xs sm:px-5 sm:py-2.5 sm:text-sm">
+              <span className="hidden sm:inline">Book a Demo</span>
+              <span className="sm:hidden">Demo</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <button
+              type="button"
+              onClick={() => setMobileOpen((open) => !open)}
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-nav"
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-cyan-500/20 text-slate-200 transition hover:border-cyan-300/50 hover:text-cyan-300 xl:hidden"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
 
-        <nav aria-label="Mobile" className="flex flex-col gap-1 border-t border-cyan-500/10 py-3 xl:hidden">
+        <nav
+          id="mobile-nav"
+          aria-label="Mobile"
+          className={`${mobileOpen ? "flex" : "hidden"} max-h-[calc(100vh-4.25rem)] flex-col gap-1 overflow-y-auto border-t border-cyan-500/10 py-3 xl:hidden`}
+        >
           {navItems.map((item) => (
             <div key={`mobile-${item.label}`}>
-              <Link href={item.href} className="block py-1.5 text-sm font-medium text-slate-200 hover:text-cyan-300">
+              <Link href={item.href} onClick={closeMobile} className="block py-1.5 text-sm font-medium text-slate-200 hover:text-cyan-300">
                 {item.label}
               </Link>
               {item.children?.length ? (
@@ -134,6 +156,7 @@ export function SiteHeader() {
                         href={child.href}
                         target={child.external ? "_blank" : undefined}
                         rel={child.external ? "noreferrer" : undefined}
+                        onClick={closeMobile}
                         className="block py-1 text-xs text-slate-400 hover:text-cyan-300"
                       >
                         {child.label}
